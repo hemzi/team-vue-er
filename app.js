@@ -25,8 +25,9 @@ const app = Vue.createApp({
         }
       });
 
-      if (arguments.length === undefined) {
-        return (this.devices = json.devices);
+      if (filterType === undefined) {
+        console.log("HAM");
+        return (this.devices = await json.devices);
       }
 
       // all offline devices
@@ -45,7 +46,7 @@ const app = Vue.createApp({
             device.online_state === "Offline" && device.last_seen === undefined
         );
 
-        return (this.devices = filtered);
+        return (this.devices = filtered), (this.deviceCount = filtered.length);
       }
     },
     async removeDevice(id) {
@@ -67,35 +68,43 @@ const app = Vue.createApp({
     async fixName(id, alias) {
       let newName = alias;
       console.log(alias);
+      // prune FCC- prefix
       newName = newName.replace("FCC-", "");
+      // prune building prefix
       newName = newName.replace(/([A-Z,a-z][0-9]*)+\-/, "");
+      // format ###### first last -> ###### (first fast)
       if (newName.match(/^\d{1,6} (\w*) (\w*)$/)) {
         newName = newName.replace(/^(\d{1,6}) (\w*) (\w*)$/, "$1 ($2 $3)");
       }
 
       console.log(newName);
-      const index = this.devices.findIndex((device) => {
-        return device.device_id === id;
-      });
 
-      console.log(index);
-      if (index !== -1) {
-        this.devices[index].alias = newName;
+      const res = await fetch(
+        `https://webapi.teamviewer.com/api/v1/devices/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ alias: newName }),
+        }
+      );
+      // update interface if success
+      if (res.status === 204) {
+        const index = this.devices.findIndex((device) => {
+          return device.device_id === id;
+        });
+
+        console.log(index);
+        if (index !== -1) {
+          this.devices[index].alias = newName;
+        }
       }
-      // const res = await fetch(
-      //   `https://webapi.teamviewer.com/api/v1/devices/${id}`,
-      //   {
-      //     method: "PUT",
-      //     headers: {
-      //       Authorization: `Bearer ${TOKEN}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
     },
   },
   mounted() {
-    this.getDevices("offline");
+    this.getDevices();
   },
 });
 
