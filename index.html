@@ -1,0 +1,33 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <script src="https://unpkg.com/vue@3.0.0"></script>
+    <title>Learning Vue</title>
+  </head>
+  <body>
+    <h1>Team-Vue-er List Manager</h1>
+    <div class="fieldset">
+      <label for="token">Token: </label
+      ><input type="password" name="token" id="token" />
+      <button>Get Devices</button>
+    </div>
+    <div id="app">
+      <div id="filter-btns">
+        <button>All</button><button>Offline</button
+        ><button>Extended Offline</button>
+      </div>
+      <p>Devices: {{ deviceCount }}</p>
+      <ul>
+        <li v-for="device in devices">
+          {{ device.alias }} - {{ device.online_state }} - {{ device.last_seen
+          }}
+          <button @click="removeDevice(device.device_id)">Remove</button>
+        </li>
+      </ul>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
