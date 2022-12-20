@@ -26,6 +26,12 @@
       <button>Get Devices</button>
     </div>
     <div id="app">
+      <input
+        type="text"
+        class="form-control"
+        v-model="search"
+        placeholder="Seach name/id"
+      />
       <div id="filter-btns">
         <button class="btn btn-secondary" @click="getDevices()">All</button
         ><button class="btn btn-secondary" @click="getDevices('offline')">
@@ -36,22 +42,32 @@
       </div>
       <p>Devices: {{ deviceCount }}</p>
       <ul class="list-group">
-        <li class="list-group-item" v-for="device in devices">
+        <li class="list-group-item" v-for="device in filteredDevices">
           <button
             class="btn btn-primary"
             @click="fixName(device.device_id, device.alias)"
           >
             Fix Name
           </button>
-          {{ device.alias }} - {{ device.online_state }} - {{ device.last_seen
-          }}
+          {{ device.alias }} - {{ device.online_state }} -
+          {{formatDate(device.last_seen)}} -
+          {{offlineExceeded(device.last_seen)}}
+          <!-- {{ device.alias }} - {{ device.online_state }} - {{ device.last_seen
+          }} -->
           <button
+            class="btn btn-danger"
+            v-if="offlineExceeded(device.last_seen)"
+            @click="removeDevice(device.device_id)"
+          >
+            Remove
+          </button>
+          <!-- <button
             class="btn btn-danger"
             v-if="device.online_state === 'Offline'"
             @click="removeDevice(device.device_id)"
           >
             Remove
-          </button>
+          </button> -->
         </li>
       </ul>
     </div>
