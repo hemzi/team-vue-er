@@ -3,9 +3,27 @@ const app = Vue.createApp({
     return {
       devices: [],
       deviceCount: 0,
+      search: "",
     };
   },
+  computed: {
+    filteredDevices: function () {
+      return this.devices.filter((device) => {
+        return device.alias.toLowerCase().match(this.search.toLowerCase());
+      });
+    },
+  },
   methods: {
+    formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString();
+    },
+    offlineExceeded(dateString) {
+      const offlineDate = new Date(dateString);
+      const now = Date.now();
+      const diff = (now - offlineDate) / (1000 * 60 * 60 * 24);
+      // const diff = (now - offlineDate) / (1000 * 60 * 60 * 24);
+      return diff > 120;
+    },
     async getDevices(filterType) {
       const res = await fetch("https://webapi.teamviewer.com/api/v1/devices", {
         method: "GET",
@@ -17,13 +35,13 @@ const app = Vue.createApp({
       const json = await res.json();
 
       // format last_seen date
-      json.devices.map((device) => {
-        if (device.last_seen !== undefined) {
-          device.last_seen = new Date(
-            Date.parse(device.last_seen)
-          ).toLocaleDateString("en-US");
-        }
-      });
+      // json.devices.map((device) => {
+      //   if (device.last_seen !== undefined) {
+      //     device.last_seen = new Date(
+      //       Date.parse(device.last_seen)
+      //     ).toLocaleDateString("en-US");
+      //   }
+      // });
 
       if (filterType === undefined) {
         console.log("HAM");
