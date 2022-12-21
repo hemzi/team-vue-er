@@ -25,27 +25,17 @@ const app = Vue.createApp({
       return diff > 120;
     },
     async getDevices(filterType) {
-      const res = await fetch("https://webapi.teamviewer.com/api/v1/devices", {
+      const res = await fetch("http://localhost:3000/api/v1/devices", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${TOKEN}`,
+          // Authorization: `Bearer ${TOKEN}`,
           "Content-Type": "application/json",
         },
       });
       const json = await res.json();
-
-      // format last_seen date
-      // json.devices.map((device) => {
-      //   if (device.last_seen !== undefined) {
-      //     device.last_seen = new Date(
-      //       Date.parse(device.last_seen)
-      //     ).toLocaleDateString("en-US");
-      //   }
-      // });
-
+      console.log(json);
       if (filterType === undefined) {
-        console.log("HAM");
-        return (this.devices = await json.devices);
+        return (this.devices = await json);
       }
 
       // all offline devices
@@ -68,21 +58,19 @@ const app = Vue.createApp({
       }
     },
     async removeDevice(id) {
-      const res = await fetch(
-        `https://webapi.teamviewer.com/api/v1/devices/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`http://localhost:3000/api/v1/devices/${id}`, {
+        method: "DELETE",
+        headers: {
+          // Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (res.status === 204) {
         this.devices = this.devices.filter((device) => device.device_id !== id);
         console.log(`REMOVEd DEVICE WITH ID: ${id}`);
       }
     },
+
     async fixName(id, alias) {
       let newName = alias;
       console.log(alias);
@@ -97,17 +85,14 @@ const app = Vue.createApp({
 
       console.log(newName);
 
-      const res = await fetch(
-        `https://webapi.teamviewer.com/api/v1/devices/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ alias: newName }),
-        }
-      );
+      const res = await fetch(`http://localhost:3000/api/v1/devices/${id}`, {
+        method: "PUT",
+        headers: {
+          // Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ alias: newName }),
+      });
       // update interface if success
       if (res.status === 204) {
         const index = this.devices.findIndex((device) => {

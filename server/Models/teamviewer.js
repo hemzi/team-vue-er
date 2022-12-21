@@ -22,27 +22,28 @@ let TeamViewer = {
     }
   },
 
-  // async updateDevice(deviceDetails) {
-  //   const { alias, device_id } = deviceDetails;
-  //   try {
-  //     let response = await fetch(`${this.base_url}/device/${device_id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         Authorization: `Bearer ${this.api_key}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: {},
-  //     });
-  //     let json = await response.json();
-  //     if (response.status == 204 && response.ok) {
-  //       this.devices = json.devices;
-  //     } else {
-  //       throw json;
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
+  async updateDevice(deviceDetails) {
+    const { alias, device_id } = deviceDetails;
+    console.log(alias, device_id);
+    try {
+      let response = await fetch(`${this.base_url}/devices/${device_id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${this.api_key}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ alias }),
+      });
+      // let json = await response.json();
+      if (response.status == 204 && response.ok) {
+        return true;
+      } else {
+        throw json;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 
 module.exports = TeamViewer;

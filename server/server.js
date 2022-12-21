@@ -1,9 +1,8 @@
 require("./config");
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const deviceRoutes = require("./Routes/DevicesRouter");
-
-const router = express.Router();
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -12,11 +11,12 @@ const PORT = process.env.PORT;
 const app = express();
 
 // middleware
+app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());
 
 // routes
-app.use("/devices", deviceRoutes);
+app.use("/api/v1/devices", deviceRoutes);
 
 // init server
 app.listen(PORT, (err) => {
