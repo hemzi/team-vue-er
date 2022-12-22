@@ -1,3 +1,4 @@
+// * CRUD logic used in the routes
 const tv = require("../Models/teamviewer");
 
 tv.api_key = process.env.TOKEN_TV;
@@ -6,9 +7,9 @@ tv.api_key = process.env.TOKEN_TV;
 setInterval(() => {
   console.log("refresh");
   tv.getDevices();
-}, 1000 * 60 * 3);
+}, 1000 * 60 * 15);
 
-// sends local cash instead of calling TV api
+// * sends local cash instead of calling TV api
 exports.get_devices = (req, res) => {
   res.send(tv.devices);
 };
@@ -17,6 +18,15 @@ exports.update_device = async (req, res) => {
   const device_id = req.params.device_id;
   const alias = req.body.alias;
   const success = await tv.updateDevice({ alias, device_id });
+  if (success) {
+    console.log(success);
+    res.status(204).send({});
+  }
+};
+
+exports.remove_device = async (req, res) => {
+  const device_id = req.params.device_id;
+  const success = await tv.removeDevice({ device_id });
   if (success) {
     console.log(success);
     res.status(204).send({});
