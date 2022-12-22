@@ -13,12 +13,13 @@ exports.get_devices = (req, res) => {
   res.send(tv.devices);
 };
 
-exports.update_device = (req, res) => {
+exports.update_device = async (req, res) => {
   const device_id = req.params.device_id;
   const alias = req.body.alias;
-  const success = tv.updateDevice({ alias, device_id });
+  const success = await tv.updateDevice({ alias, device_id });
   if (success) {
-    res.status(204);
+    console.log(success);
+    res.status(204).send({});
   }
 };
 
