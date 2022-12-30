@@ -16,7 +16,6 @@ const getDevices = () => {
         throw Error("There is no data.");
       }
       const json = await res.json();
-      console.log(json);
 
       devices.value = await json;
     } catch (err) {
