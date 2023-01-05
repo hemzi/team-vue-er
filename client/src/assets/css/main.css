@@ -19,8 +19,13 @@ ul {
 }
 
 .pill {
+  cursor: pointer;
   color: white;
   border-radius: 20px;
   padding: 5px 10px;
   margin: 5px;
+}
+
+.pill:hover {
+  opacity: 0.8;
 }

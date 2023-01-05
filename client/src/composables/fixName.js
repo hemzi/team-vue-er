@@ -1,37 +1,44 @@
 import { ref } from "vue";
-const fixName = async (id, alias, devices) => {
-  let newName = ref(alias);
+const fixName = async (device) => {
+  console.log("ping");
+  const { id, alias, devices } = device;
+  const error = null;
+  let newName = alias;
   // prune FCC- prefix
-  newName.value = newName.value.replace("FCC-", "");
+  newName.value = newName.replace("FCC-", "");
   // prune building prefix
-  newName.value = newName.value.replace(/([A-Z,a-z][0-9]*)+\-/, "");
+  newName = newName.replace(/([A-Z,a-z][0-9]*)+\-/, "");
   // format ###### first last -> ###### (first fast)
   if (newName.match(/^\d{1,6} (\w*) (\w*)$/)) {
-    newName.value = newName.value.replace(
-      /^(\d{1,6}) (\w*) (\w*)$/,
-      "$1 ($2 $3)"
-    );
+    newName = newName.replace(/^(\d{1,6}) (\w*) (\w*)$/, "$1 ($2 $3)");
   }
+  try {
+    const res = await fetch(`http://localhost:3000/api/v1/devices/${id}`, {
+      method: "PUT",
+      headers: {
+        // Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ alias: newName }),
+    });
+    // update interface if success
+    // * may need to changes this to check for http 204
+    if (!res.ok) {
+      throw Error("there was error while fixing name");
+    }
 
-  const res = await fetch(`http://localhost:3000/api/v1/devices/${id}`, {
-    method: "PUT",
-    headers: {
-      // Authorization: `Bearer ${TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ alias: newName.value }),
-  });
-  // update interface if success
-  if (res.status === 204) {
-    const index = this.devices.findIndex((device) => {
+    const index = devices.value.findIndex((device) => {
       return device.device_id === id;
     });
 
-    console.log(index);
     if (index !== -1) {
-      this.devices[index].alias = newName.value;
+      devices.value[index].alias = newName;
     }
+  } catch (err) {
+    error = err.message;
   }
 
-  return { newName };
+  return { newName, error, devices };
 };
+
+export default fixName;

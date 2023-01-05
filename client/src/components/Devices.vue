@@ -1,15 +1,11 @@
 <template>
   <div><input type="text" v-model="searchTerm" />{{ searchTerm }}</div>
   <div>
+    <span class="pill all" @click="updateFilter('all')">All</span>
     <span class="pill online" @click="updateFilter('online')">Online</span>
-    <span class="pill offline" @click="updateFilter('offline')"
-      >Offline &lsaquo;3 Months</span
-    >
-    <span class="pill extended" @click="updateFilter('extended')"
-      >Offline &rsaquo;3 Months</span
-    >
+    <span class="pill offline" @click="updateFilter('offline')">Offline &lsaquo;3 Months</span>
+    <span class="pill extended" @click="updateFilter('extended')">Offline &rsaquo;3 Months</span>
     <span class="pill unknown" @click="updateFilter('unknown')">Offline Unknown</span>
-    {{ filterType }}
   </div>
   <ul>
     <li v-for="device in searchedDevices" :key="device.device_id">
@@ -18,15 +14,12 @@
       <div class="device_item online" v-if="device.online_state === 'Online'">
         <span>
           <i class="fa-solid fa-pen-to-square"></i>
-          <i class="fa-sharp fa-solid fa-hammer" al @click="fixName"></i>
+          <i class="fa-sharp fa-solid fa-hammer" @click="fixName"></i>
           {{ device.alias }}
         </span>
       </div>
       <!-- OFFLINE -->
-      <div
-        class="device_item offline"
-        v-if="device.last_seen && !offlineExceeded(device.last_seen)"
-      >
+      <div class="device_item offline" v-if="device.last_seen && !offlineExceeded(device.last_seen)">
         <span>
           <i class="fa-solid fa-pen-to-square"></i>
           <i class="fa-sharp fa-solid fa-hammer" @click="fixName"></i>
@@ -38,17 +31,13 @@
         <span>
           <i class="fa-solid fa-pen-to-square"></i>
           <i class="fa-sharp fa-solid fa-hammer" @click="fixName"></i>
-          {{ device.alias }} </span
-        ><span>
+          {{ device.alias }} </span><span>
           [{{ formatDate(device.last_seen) }}]
           <i class="fa-solid fa-trash"></i>
         </span>
       </div>
       <!-- UNKNOWN -->
-      <div
-        class="device_item unknown"
-        v-if="device.online_state === 'Offline' && !device.last_seen"
-      >
+      <div class="device_item unknown" v-if="device.online_state === 'Offline' && !device.last_seen">
         <span>
           <i class="fa-solid fa-pen-to-square"></i>
           <i class="fa-sharp fa-solid fa-hammer" @click="fixName"></i>
@@ -64,11 +53,13 @@
 // composables
 import formatDate from "../composables/formatDate";
 import getDevices from "../composables/getDevices";
+import fixName from "@/composables/fixName";
 import { computed, ref } from "vue";
 
 export default {
   setup() {
     const { devices, error, load } = getDevices();
+    const { newName } = fixName();
 
     const searchTerm = ref("");
     const filterType = ref("all");
@@ -118,7 +109,7 @@ export default {
       return diff > 120;
     }
 
-    function fixname() {}
+    function fixname() { }
     load();
     return {
       devices,
@@ -148,6 +139,10 @@ export default {
 
 .device_item:hover {
   opacity: 0.8;
+}
+
+.all {
+  background: blueviolet;
 }
 
 .online {
